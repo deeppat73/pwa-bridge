@@ -17,7 +17,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    self.addEventListener('fetch', (event) => {
     // 1. Check if the request is going to localhost or 127.0.0.1
     if (event.request.url.includes('localhost') || event.request.url.includes('127.0.0.1')) {
         // Return nothing, which tells the browser to handle the request 
