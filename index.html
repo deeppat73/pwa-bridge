@@ -12,30 +12,61 @@
     <p id="status">Ready to bridge requests...</p>
 
     <script>
-        // Listen for messages from your main Web App
         // Listen for messages from the top-level Web App
         window.addEventListener("message", async (event) => {
-			const { targetUrl, options } = event.data;
-			try {
-				const response = await fetch(targetUrl, {
-					method: options.method || 'POST',
-					headers: options.headers || {},
-					body: options.body 
-				});
-				const result = await response.json();
-				// Send the JSON object back to the main app
-				event.source.postMessage({ status: 'success', data: result }, event.origin);
-			} catch (err) {
-				// If it's a parsing error or network error, send it back
-				console.log(err);
-				event.source.postMessage({ status: 'error', message: err.message }, event.origin);
+			const {type, targetUrl, options } = event.data;
+			
+			if (type === "HEARTBEAT_CHECK") {
+				await handleHeartbeat(event, targetUrl);
+			}else{
+				await handleRequest(event, targetUrl, options);
 			}
 		});
+		async function handleHeartbeat(event, targetUrl) {
 
+			try {
+				const controller = new AbortController();
+				const timer = setTimeout(() => controller.abort(), 2000);
+
+				const response = await fetch(targetUrl, { 
+					method: 'GET',
+					signal: controller.signal,
+					// Keep the Private Network header context
+					headers: { 'Accept': 'application/json' }
+				});
+				
+				clearTimeout(timer);
+				const json = await response.json();
+
+				event.source.postMessage({ 
+					type: 'HEARTBEAT_STATUS', 
+					online: json.status === "ok",
+					serverData: json // Pass back the {"status":"ok"}
+				}, event.origin);
+
+			} catch (err) {
+				event.source.postMessage({ 
+					type: 'HEARTBEAT_STATUS', 
+					online: false,
+					error: err.message 
+				}, event.origin);
+			}
+		}
+
+		async function handleRequest(event, targetUrl, options) {
+			try {
+				const response = await fetch(targetUrl, options);
+				const result = await response.json();
+				event.source.postMessage({ status: 'success', data: result }, event.origin);
+			} catch (err) {
+				event.source.postMessage({ status: 'error', message: err.message }, event.origin);
+			}
+		}
         // Register the Service Worker for installation
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
-        }
+			navigator.serviceWorker.register('./sw.js')
+				.then(reg => reg.update()); // Force check for updates on every load
+		}
     </script>
 </body>
 </html>
