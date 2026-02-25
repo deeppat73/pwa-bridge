@@ -17,6 +17,8 @@ self.addEventListener('fetch', (event) => {
     if (event.request.url.includes('localhost') || event.request.url.includes('127.0.0.1')) {
         // Return nothing, which tells the browser to handle the request 
         // normally OUTSIDE of the Service Worker's sandbox.
+        //It causes The FetchEvent for "http://localhost:62034/sign" resulted in a network error response
+        //on chromium based browsers
         return; 
     }
 
