@@ -1,5 +1,9 @@
 const CACHE_NAME = 'bridge-v1';
-const ASSETS = ['./index.html', './manifest.json','./icon-192x192.png','./icon-512x512.png'];
+const ASSETS = ['./',
+    './index.html',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png'];
 
 // Cache files on install
 self.addEventListener('install', (event) => {
