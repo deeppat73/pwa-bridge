@@ -27,6 +27,7 @@
 				event.source.postMessage({ status: 'success', data: result }, event.origin);
 			} catch (err) {
 				// If it's a parsing error or network error, send it back
+				console.log(err);
 				event.source.postMessage({ status: 'error', message: err.message }, event.origin);
 			}
 		});
