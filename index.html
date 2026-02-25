@@ -67,8 +67,15 @@
 		}
         // Register the Service Worker for installation
         if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('./sw.js')
-				.then(reg => reg.update()); // Force check for updates on every load
+			navigator.serviceWorker.register('./sw.js').then(reg => {
+				// Wait until the service worker is active and controlling the page
+				navigator.serviceWorker.ready.then(() => {
+					// Give the browser a tiny moment to ensure the 'controller' is set
+					setTimeout(() => {
+						window.parent.postMessage({ type: "BRIDGE_READY" }, "*");
+					}, 100);
+				});
+			});
 		}
     </script>
 </body>
