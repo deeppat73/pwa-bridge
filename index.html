@@ -12,9 +12,9 @@
     <p id="status">Ready to bridge requests...</p>
 
     <script>
-		window.onload = () => {
+		/*window.onload = () => {
    			window.parent.postMessage({ type: "BRIDGE_READY" }, "*");
-		};
+		};*/
         // Listen for messages from the top-level Web App
         window.addEventListener("message", async (event) => {
 			const {type, targetUrl, options } = event.data;
